@@ -1,5 +1,23 @@
 class Event < ActiveRecord::Base
+  before_create :start_date, format: { with: /(\d{4}-\d{2}-\d{2}\s{1}\d{2}:\d{2}:\d{2})/,
+    message: "incorrect format" }
+  before_create :end_date, format: { with: /(\d{4}-\d{2}-\d{2}\s{1}\d{2}:\d{2}:\d{2})/,
+    message: "incorrect format" }
+
+  validates :start_date, presence: true
+  validates :end_date, presence: true
+
   has_many :notes
+
+  def check_start_date
+    string = self.start_date.to_s
+    self.start_date = (string.scan(/(\d{4}-\d{2}-\d{2}\s{1}\d{2}:\d{2}:\d{2})/)).join("") + " UTC"
+  end
+
+  def check_end_date
+    string = self.end_date.to_s
+    self.end_date = (string.scan(/(\d{4}-\d{2}-\d{2}\s{1}\d{2}:\d{2}:\d{2})/)).join("") + " UTC"
+  end
 
   def self.remove_old_events
     future = []
